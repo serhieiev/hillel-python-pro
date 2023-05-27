@@ -15,12 +15,12 @@
 
 ```bash
 export COUNT_CHARS=5
-head -n $COUNT_CHARS filename | wc -c
+sed -n "${COUNT_CHARS}p" filename | wc -c
 ```
 
-The `head -n $COUNT_CHARS` filename command reads the first N lines of the file named `filename` and `wc -c` counts the number of characters in these lines. Replace filename with the actual name of your file.
+The `sed -n "${COUNT_CHARS}p" filename` command prints only the specified line of the file named `filename` and `wc -c` counts the number of characters in that line. Replace filename with the actual name of your file.
 
-<img width="577" alt="count_chars_output" src="https://github.com/serhieiev/hillel-python-pro/assets/12089303/dd24d4ee-e763-4823-a0b5-2ae5fc8f0866">
+<img width="580" alt="count_chars_output" src="https://github.com/serhieiev/hillel-python-pro/assets/12089303/bf7be1a7-33be-4792-81ae-2cecdb6365c3">
 
 ### Installing Python with pyenv
 
