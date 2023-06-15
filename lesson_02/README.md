@@ -1,4 +1,4 @@
-# lesson_01: Unix CLI utils
+# lesson_02: Unit tests, integration test
 
 ## Home assignment
 
