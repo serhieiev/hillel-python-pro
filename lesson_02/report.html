@@ -439,10 +439,10 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
 }
 </script>
     <h1>report.html</h1>
-    <p>Report generated on 16-Jun-2023 at 17:28:00 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
+    <p>Report generated on 16-Jun-2023 at 18:18:19 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a> v3.2.0</p>
     <h2>Summary</h2>
     <p>17 tests ran in 0.13 seconds. </p>
-    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">14 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">3 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
+    <p class="filter" hidden="true">(Un)check the boxes to filter the results.</p><input checked="true" class="filter" data-test-result="passed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="passed">13 passed</span>, <input checked="true" class="filter" data-test-result="skipped" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="skipped">0 skipped</span>, <input checked="true" class="filter" data-test-result="failed" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="failed">4 failed</span>, <input checked="true" class="filter" data-test-result="error" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="error">0 errors</span>, <input checked="true" class="filter" data-test-result="xfailed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xfailed">0 expected failures</span>, <input checked="true" class="filter" data-test-result="xpassed" disabled="true" hidden="true" name="filter_checkbox" onChange="filterTable(this)" type="checkbox"/><span class="xpassed">0 unexpected passes</span>
     <h2>Results</h2>
     <table id="results-table">
       <thead id="results-table-head">
@@ -480,6 +480,15 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <tr>
           <td class="extra" colspan="4">
             <div class="log">x = 1, y = -2, expected_result = -2.0<br/><br/>    @pytest.mark.parametrize(&quot;x,y,expected_result&quot;, [(1, 2, 2.0), (2, 1, 0.5), (1, -2, -2.0)])<br/>    def test_op_divide(x: float, y: float, expected_result: float):<br/>        result = op_divide(x, y)<br/>    <br/>&gt;       assert result == expected_result<br/><span class="error">E       assert -0.5 == -2.0</span><br/><br/>test_drunk_polish_calculator.py:34: AssertionError<br/></div></td></tr></tbody>
+      <tbody class="failed results-table-row">
+        <tr>
+          <td class="col-result">Failed</td>
+          <td class="col-name">test_drunk_polish_calculator.py::test_main[6 3 /-2.0]</td>
+          <td class="col-duration">0.00</td>
+          <td class="col-links"></td></tr>
+        <tr>
+          <td class="extra" colspan="4">
+            <div class="log">capsys = &lt;_pytest.capture.CaptureFixture object at 0x102a30970&gt;, expression = &#x27;6 3 /&#x27;, expected_output = &#x27;2.0&#x27;<br/><br/>    @pytest.mark.parametrize(<br/>        &quot;expression, expected_output&quot;,<br/>        [<br/>            (&quot;2 3 +&quot;, &quot;5.0&quot;),<br/>            (&quot;2 3 *&quot;, &quot;6.0&quot;),<br/>            (&quot;3 2 -&quot;, &quot;1.0&quot;),<br/>            (&quot;6 3 /&quot;, &quot;2.0&quot;),<br/>            (&quot;2 3 4 * +&quot;, &quot;14.0&quot;),<br/>        ]<br/>    )<br/>    def test_main(capsys, expression, expected_output):<br/>        with patch(&#x27;builtins.input&#x27;, return_value=expression):<br/>            main()<br/>    <br/>&gt;       assert capsys.readouterr().out.rstrip() == expected_output<br/><span class="error">E       AssertionError: assert &#x27;0.5&#x27; == &#x27;2.0&#x27;</span><br/><span class="error">E         - 2.0</span><br/><span class="error">E         + 0.5</span><br/><br/>test_drunk_polish_calculator.py:53: AssertionError<br/></div></td></tr></tbody>
       <tbody class="passed results-table-row">
         <tr>
           <td class="col-result">Passed</td>
@@ -583,15 +592,6 @@ function filterTable(elem) { // eslint-disable-line no-unused-vars
         <tr>
           <td class="col-result">Passed</td>
           <td class="col-name">test_drunk_polish_calculator.py::test_main[3 2 --1.0]</td>
-          <td class="col-duration">0.00</td>
-          <td class="col-links"></td></tr>
-        <tr>
-          <td class="extra" colspan="4">
-            <div class="empty log">No log output captured.</div></td></tr></tbody>
-      <tbody class="passed results-table-row">
-        <tr>
-          <td class="col-result">Passed</td>
-          <td class="col-name">test_drunk_polish_calculator.py::test_main[6 3 /-0.5]</td>
           <td class="col-duration">0.00</td>
           <td class="col-links"></td></tr>
         <tr>
