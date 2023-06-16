@@ -27,13 +27,13 @@ def test_op_multiply(x: float, y: float, expected_result: float):
     assert result == expected_result
 
 # Test op_divide function
-@pytest.mark.parametrize("x,y,expected_result", [(1, 2, 0.5), (2, 1, 2.0), (-2, 1, -2.0)])
+@pytest.mark.parametrize("x,y,expected_result", [(1, 2, 2.0), (2, 1, 0.5), (1, -2, -2.0)])
 def test_op_divide(x: float, y: float, expected_result: float):
     result = op_divide(x, y)
     
     assert result == expected_result
     with pytest.raises(ZeroDivisionError):
-        op_divide(1, 0)
+        op_divide(0, 1)
 
 # Test main function
 @pytest.mark.parametrize(
@@ -41,8 +41,8 @@ def test_op_divide(x: float, y: float, expected_result: float):
     [
         ("2 3 +", "5.0"),
         ("2 3 *", "6.0"),
-        ("2 3 -", "1.0"),
-        ("6 3 /", "2.0"),
+        ("3 2 -", "1.0"),
+        ("6 3 /", "0.5"),
         ("2 3 4 * +", "14.0"),
     ]
 )
