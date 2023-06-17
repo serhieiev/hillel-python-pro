@@ -34,10 +34,10 @@
 
 Acceptance criteria (-10 балів за невиконання):
 
-Модель має усі перелічені поля
-Може бути збережена у БД
-Покриття тестами
-Не можна використовувати ORM (SqlAlchemi наприклад) тільки чистий sql.
+- Модель має усі перелічені поля
+- Може бути збережена у БД
+- Покриття тестами
+- Не можна використовувати ORM (SqlAlchemi наприклад) тільки чистий sql.
 
 ## Solution
 
@@ -63,7 +63,7 @@ card_status INTEGER NOT NULL
 >>> conn.close()
 ```
 
-To generate encryption key
+To generate encryption key:
 ```python
 python3
 >>> from cryptography.fernet import Fernet
