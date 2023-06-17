@@ -1,9 +1,9 @@
 import os
+import sqlite3
 from datetime import date
 from uuid import UUID, uuid4
 from enum import Enum
 from typing import Optional
-import sqlite3
 from cryptography.fernet import Fernet
 
 
