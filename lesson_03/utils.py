@@ -16,21 +16,23 @@ def validate_and_format_date(date: str) -> str:
     )
 
 
-def standardize_bank_name(bank: str) -> str:
-    bank_names_dict = {
-        "nbu": "NB",
-        "nationalbank": "NB",
-        "National Bank": "NB",
-        "NB": "NB",
+def validate_and_format_bank(bank: str) -> str:
+    bank_dict = {
+        "nbu": "NBU",
+        "nationalbank": "NBU",
+        "national bank": "NBU",
+        "NBU": "NBU",
         "pb": "PB",
         "PB": "PB",
         "privatbank": "PB",
         "PrivatBank": "PB",
     }
     try:
-        return bank_names_dict[bank]
+        return bank_dict[bank]
     except KeyError:
-        raise ValueError("Invalid bank name. Please use either NBU or PrivatBank.")
+        raise ValueError(
+            "Invalid bank input! Acceptable inputs are nbu, nationalbank, National Bank, NBU, pb, PB, privatbank, PrivatBank"
+        )
 
 
 def get_currency_iso_code(currency: str) -> int:
@@ -78,12 +80,9 @@ def get_currency_exchange_rate(currency_a: str, currency_b: str) -> str:
         return f"Api error {response.status_code}: {json.get('errorDescription')}"
 
 
-# print(get_currency_exchange_rate('USD', 'UAH'))
-
-
 def get_pb_exchange_rate(convert_currency: str, bank: str, rate_date: str) -> str:
     rate_date = validate_and_format_date(rate_date)
-    bank = standardize_bank_name(bank)
+    bank = validate_and_format_bank(bank)
     params = {
         "json": "",
         "date": rate_date,
@@ -113,7 +112,3 @@ def get_pb_exchange_rate(convert_currency: str, bank: str, rate_date: str) -> st
                         return f"There is no exchange rate PrivatBank for {convert_currency}"
     else:
         return f"error {response.status_code}"
-
-
-result = get_pb_exchange_rate("USD", "privatbank", "2022-04-17")
-print(result)
