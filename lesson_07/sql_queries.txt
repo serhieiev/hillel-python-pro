@@ -1,0 +1,65 @@
+--enable UUID Generator V4 on uuid fields
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE warehouses(
+id UUID NOT NULL PRIMARY KEY,
+name varchar(30) NOT NULL,
+country varchar(30) NOT NULL,
+city varchar(30) NOT NULL,
+street_address varchar(100) NOT NULL
+);
+
+--SELECT * FROM warehouses 
+
+CREATE TABLE items(
+id UUID NOT NULL PRIMARY KEY,
+sku varchar(10) NOT NULL,
+name varchar(50) NOT NULL,
+brand_id integer NOT NULL,
+unit_price decimal(10) NOT NULL,
+description varchar(225),
+quantity integer NOT NULL,
+warehouse_id UUID REFERENCES warehouses(id) 
+);
+
+--SELECT * FROM items 
+
+INSERT INTO warehouses(id, name, country, city, street_address)
+VALUES
+(UUID_GENERATE_V4(), 'Bessemer Warehouse', 'USA', 'Bessemer', '975 Powder Plant Rd, Bessemer, AL 35022'),
+(UUID_GENERATE_V4(), 'Phoenix Warehouse', 'USA', 'Phoenix', '6835 W Buckeye Rd, Phoenix, AZ 85043'),
+(UUID_GENERATE_V4(), 'Little Rock Warehouse', 'USA', 'North Little Rock', '1920 N Locust St, North Little Rock, AR 72114');
+
+
+INSERT INTO items (id, sku, name, brand_id, unit_price, description, quantity, warehouse_id)
+VALUES
+(UUID_GENERATE_V4(), 'SKU1001', 'iPhone 14 Pro Max', 1, 1199.00, 'Apple iPhone 12 Pro Max - 256GB - Pacific Blue', 50, '99a91b16-c868-430d-b62a-c717c19404be'),
+(UUID_GENERATE_V4(), 'SKU1002', 'Galaxy S21', 2, 799.99, 'Samsung Galaxy S21 - 128GB - Phantom Gray', 75, '99a91b16-c868-430d-b62a-c717c19404be'),
+(UUID_GENERATE_V4(), 'SKU1003', 'MacBook Pro', 1, 2399.00, 'Apple MacBook Pro - 16 inch - 512GB - Space Gray', 30, '87a2ca8b-d849-4ed3-acf7-535a0384d461'),
+(UUID_GENERATE_V4(), 'SKU1004', 'Dell XPS 13', 3, 1249.99, 'Dell XPS 13 - 13.4 inch - 256GB - Silver', 40, '87a2ca8b-d849-4ed3-acf7-535a0384d461'),
+(UUID_GENERATE_V4(), 'SKU1005', 'iPad Pro', 1, 999.00, 'Apple iPad Pro - 12.9 inch - 128GB - Space Gray', 60, '57d95fe2-55cc-4708-b36a-4935f4c747cf'),
+(UUID_GENERATE_V4(), 'SKU1006', 'Canon EOS R5', 4, 3899.00, 'Canon EOS R5 Full Frame Mirrorless Camera', 20, '57d95fe2-55cc-4708-b36a-4935f4c747cf'),
+(UUID_GENERATE_V4(), 'SKU1007', 'Sony A7III', 5, 1998.00, 'Sony A7III Full Frame Mirrorless Camera', 25, '99a91b16-c868-430d-b62a-c717c19404be'),
+(UUID_GENERATE_V4(), 'SKU1008', 'Bose QC35 II', 6, 299.00, 'Bose QuietComfort 35 II Wireless Bluetooth Headphones', 80, '87a2ca8b-d849-4ed3-acf7-535a0384d461'),
+(UUID_GENERATE_V4(), 'SKU1009', 'Nintendo Switch', 7, 299.99, 'Nintendo Switch with Neon Blue and Neon Red Joy‑Con', 100, '87a2ca8b-d849-4ed3-acf7-535a0384d461'),
+(UUID_GENERATE_V4(), 'SKU1010', 'Sony PS5 DE', 5, 499.99, 'Sony PlayStation 5 Digital Edition Console', 15, '99a91b16-c868-430d-b62a-c717c19404be');
+
+
+UPDATE items
+SET unit_price = 2199.00, quantity = 45
+WHERE sku = 'SKU1003';
+
+
+UPDATE items
+SET name = 'Canon EOS R5 REF', unit_price = 2349.00, quantity = 10
+WHERE sku = 'SKU1006';
+
+
+DELETE FROM items
+WHERE warehouse_id = '99a91b16-c868-430d-b62a-c717c19404be';
+
+
+CREATE INDEX items_name_idx ON items(name);
+
+
+
