@@ -20,6 +20,10 @@
 To create postgresql `cards` table, execute:
 
 ```sql
+CREATE TYPE CardStatus AS ENUM ('NEW', 'ACTIVE', 'BLOCKED');
+```
+
+```sql
 CREATE TABLE cards (
     card_id UUID PRIMARY KEY,
     card_number TEXT NOT NULL,
