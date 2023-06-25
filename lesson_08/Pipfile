@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 cryptography = "*"
 pytest = "*"
+flask = "*"
+psycopg2-binary = "*"
+python-dotenv = "*"
 
 [dev-packages]
 black = "*"
