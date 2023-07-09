@@ -1,4 +1,4 @@
-# lesson_08: Django. Models, Migrations, Tests.
+# lesson_11: Django. Models, Migrations, Tests.
 
 ## Home assignment
 
