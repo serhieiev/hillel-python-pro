@@ -50,7 +50,7 @@ SECRET_KEY=
 
 To run Django server:
 ```bash
-python config/manage.py runserver
+python manage.py runserver
 ```
 
 To run tests:
