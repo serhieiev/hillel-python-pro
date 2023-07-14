@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .error-message {
+      color: red;
+      font-weight: bold;
+      padding: 10px;
+      border: 1px solid red;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Create New Card</h2>
+
+{% if error %}
+  <p class="error-message">Error: {{ error }}</p>
+{% endif %}
+
+<form action="/create" method="POST">
+  {% csrf_token %}
+  <label for="card_number">Card Number*</label><br>
+  <input type="text" id="card_number" name="card_number" required style="width:300px; height:30px;"><br>
+
+  <label for="card_expire_date">Card Expiry Date*</label><br>
+  <input type="date" id="card_expire_date" name="card_expire_date" required style="width:300px; height:30px;"><br>
+
+  <label for="card_cvv">CVV*</label><br>
+  <input type="password" id="card_cvv" name="card_cvv" required style="width:300px; height:30px;"><br>
+
+  <label for="card_issue_date">Card Issue Date*</label><br>
+  <input type="date" id="card_issue_date" name="card_issue_date" required style="width:300px; height:30px;"><br>
+
+  <label for="card_holder_id">Card Holder ID*</label><br>
+  <input type="text" id="card_holder_id" name="card_holder_id" required style="width:300px; height:30px;"><br>
+
+  <label for="card_status">Card Status*</label><br>
+  <select id="card_status" name="card_status" required style="width:300px; height:30px;">
+    <option value="">Select...</option>
+    <option value="NEW">NEW</option>
+    <option value="ACTIVE">ACTIVE</option>
+    <option value="BLOCKED">BLOCKED</option>
+  </select><br>
+
+  <input type="submit" value="Create Card" style="width:100px; height:30px;">
+</form> 
+
+</body>
+</html>

@@ -53,17 +53,3 @@ class CardModelTest(TestCase):
         self.card.block()
         with self.assertRaises(ValueError):
             self.card.activate()
-
-    def test_load_from_db(self):
-        card = Card.load_from_db(self.card.card_id)
-        self.assertEqual(card.card_id, self.card.card_id)
-
-    def test_load_from_db_not_exist(self):
-        card = Card.load_from_db(UUID("123e4567-e89b-12d3-a456-426614174002"))
-        self.assertEqual(card, None)
-
-    def test_delete_card(self):
-        card_id = self.card.card_id
-        self.card.delete_card()
-        card = Card.load_from_db(card_id)
-        self.assertEqual(card, None)

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>All Cards</h2>
+
+<!-- Add Card button -->
+<button onclick="location.href='{% url 'create_card_form' %}'" type="button">Add Card</button>
+
+<table style="width:100%; border-collapse: collapse;">
+  <tr style="background-color: #f2f2f2;">
+    <th style="border: 1px solid #dddddd; padding: 8px;">Card ID</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Card Number</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Expiry Date</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Issue Date</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Holder ID</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Status</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Created At</th>
+    <th style="border: 1px solid #dddddd; padding: 8px;">Modified At</th>
+  </tr>
+  {% for card in cards %}
+  <tr>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.card_id}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.mask_card_number}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.card_expire_date}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.card_issue_date}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.card_holder_id}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.card_status}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.created_at}}</td>
+    <td style="border: 1px solid #dddddd; padding: 8px;">{{card.modified_at}}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="8" style="text-align: center; border: 1px solid #dddddd; padding: 8px;">No cards found</td>
+  </tr>
+  {% endfor %}
+</table>
+
+</body>
+</html>

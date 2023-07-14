@@ -17,7 +17,7 @@ class Card(models.Model):
     card_number = EncryptedTextField()
     card_expire_date = models.CharField(max_length=10)
     card_cvv = EncryptedTextField()
-    card_issue_date = models.DateField()
+    card_issue_date = models.CharField(max_length=10)
     card_holder_id = models.UUIDField()
     card_status = models.CharField(max_length=10)
     created_at = models.DateTimeField(auto_now_add=True)
