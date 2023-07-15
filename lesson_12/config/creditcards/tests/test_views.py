@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.template.loader import render_to_string
 from ..models import Card, CardStatus
 import json
 from uuid import uuid4
@@ -20,7 +21,35 @@ class CardTestBase(TestCase):
         self.card_id = str(self.card.card_id)
 
 
-class CardFormViewTest(CardTestBase):
+class CreateCardFormViewTest(CardTestBase):
+    def test_display_create_card_form(self):
+        response = self.client.get("/create")
+        self.assertEqual(response.status_code, 200)
+        
+        html_content = str(response.content, encoding='utf8')
+
+        # Check the form
+        self.assertIn('<form action="/create" method="POST">', html_content)
+
+        # Check the input fields
+        self.assertIn('<input type="text" id="card_number" name="card_number" required', html_content)
+        self.assertIn('<input type="date" id="card_expire_date" name="card_expire_date" required', html_content)
+        self.assertIn('<input type="password" id="card_cvv" name="card_cvv" required', html_content)
+        self.assertIn('<input type="date" id="card_issue_date" name="card_issue_date" required', html_content)
+        self.assertIn('<input type="text" id="card_holder_id" name="card_holder_id" required', html_content)
+
+        # Check the select field
+        self.assertIn('<select id="card_status" name="card_status" required', html_content)
+
+        # Check the options in the select field
+        self.assertIn('<option value="">Select...</option>', html_content)
+        self.assertIn('<option value="NEW">NEW</option>', html_content)
+        self.assertIn('<option value="ACTIVE">ACTIVE</option>', html_content)
+        self.assertIn('<option value="BLOCKED">BLOCKED</option>', html_content)
+
+        # Check the submit button
+        self.assertIn('<input type="submit" value="Create Card"', html_content)
+
     def test_create_card_form_post_with_valid_data(self):
         response = self.client.post("/create", self.valid_card_data)
         self.assertEqual(response.status_code, 302)
@@ -34,28 +63,16 @@ class CardFormViewTest(CardTestBase):
 
 
 class DisplayCardsViewTest(CardTestBase):
-    def test_display_cards_get(self):
+    def test_display_cards_view(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        last_four_digits = self.card.card_number[-4:]
-        self.assertContains(response, last_four_digits)
+        expected_html = render_to_string(
+            "creditcards/display_cards.html", {"cards": [self.card]}
+        )
+        self.assertHTMLEqual(str(response.content, encoding="utf8"), expected_html)
 
 
 class CardViewTest(CardTestBase):
-    def setUp(self):
-        self.client = Client()
-        self.valid_card_data = {
-            "card_number": "4532015112830366",
-            "card_expire_date": "2027-07-10",
-            "card_cvv": "123",
-            "card_issue_date": "2023-07-10",
-            "card_holder_id": str(uuid4()),
-            "card_status": CardStatus.NEW.value,
-        }
-
-        self.card = Card.objects.create(**self.valid_card_data)
-        self.card_id = str(self.card.card_id)
-
     def test_create_card(self):
         response = self.client.post(
             "/card",
