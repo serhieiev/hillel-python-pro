@@ -4,7 +4,44 @@ import json
 from uuid import uuid4
 
 
-class CardViewTest(TestCase):
+class CardTestBase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.valid_card_data = {
+            "card_number": "5265532938790574",
+            "card_expire_date": "2027-07-10",
+            "card_cvv": "123",
+            "card_issue_date": "2023-07-10",
+            "card_holder_id": str(uuid4()),
+            "card_status": CardStatus.NEW.value,
+        }
+
+        self.card = Card.objects.create(**self.valid_card_data)
+        self.card_id = str(self.card.card_id)
+
+
+class CardFormViewTest(CardTestBase):
+    def test_create_card_form_post_with_valid_data(self):
+        response = self.client.post("/create", self.valid_card_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/")
+
+    def test_create_card_form_post_with_invalid_data(self):
+        invalid_card_data = self.valid_card_data.copy()
+        invalid_card_data["card_number"] = "1234567812345678"
+        response = self.client.post("/create", invalid_card_data)
+        self.assertContains(response, "Invalid card number", status_code=200)
+
+
+class DisplayCardsViewTest(CardTestBase):
+    def test_display_cards_get(self):
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, 200)
+        last_four_digits = self.card.card_number[-4:]
+        self.assertContains(response, last_four_digits)
+
+
+class CardViewTest(CardTestBase):
     def setUp(self):
         self.client = Client()
         self.valid_card_data = {

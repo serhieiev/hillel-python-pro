@@ -1,9 +1,38 @@
 from django.http import JsonResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
 from .models import Card, CardStatus
 from uuid import UUID
 from datetime import date
 import json
+
+
+def create_card_form(request):
+    if request.method == "POST":
+        data = request.POST
+
+        card = Card(
+            card_number=data["card_number"],
+            card_expire_date=data["card_expire_date"],
+            card_cvv=data["card_cvv"],
+            card_issue_date=date.fromisoformat(data["card_issue_date"]),
+            card_holder_id=UUID(data["card_holder_id"]),
+            card_status=CardStatus(data["card_status"]).value,
+        )
+
+        if not card.is_valid():
+            return render(request, 'creditcards/create_card_form.html', {"error": "Invalid card number"})
+
+        card.save()
+
+        return redirect('display_cards')
+    return render(request, 'creditcards/create_card_form.html')
+
+
+def display_cards(request):
+    cards = Card.objects.all()
+    return render(request, 'creditcards/display_cards.html', {'cards': cards})
+
 
 
 @csrf_exempt
