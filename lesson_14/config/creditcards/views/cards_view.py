@@ -25,16 +25,12 @@ class CardListCreateAPIView(APIView):
         serializer = CardSerializer(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            owner = validated_data.pop(
-                "owner", None
-            )
+            owner = validated_data.pop("owner", None)
             card = Card(**validated_data, owner=request.user)
             try:
                 if card.is_valid():
                     card.save()
-                    serializer = CardSerializer(
-                        card
-                    )
+                    serializer = CardSerializer(card)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return Response(
