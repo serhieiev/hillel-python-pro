@@ -1,10 +1,12 @@
+from django.contrib.auth.models import User
 from django.test import TestCase
 from uuid import UUID
-from ..models import Card, CardStatus
+from ..models.card import Card, CardStatus
 
 
 class CardModelTest(TestCase):
     def setUp(self):
+        self.user = User.objects.create_user(username="testuser", password="testpass")
         self.card = Card.objects.create(
             card_number="4532015112830366",
             card_expire_date="2025-07-09",
@@ -12,6 +14,7 @@ class CardModelTest(TestCase):
             card_issue_date="2022-07-09",
             card_holder_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
             card_status=CardStatus.NEW.value,
+            owner=self.user,
         )
 
     def test_is_valid(self):
@@ -53,17 +56,3 @@ class CardModelTest(TestCase):
         self.card.block()
         with self.assertRaises(ValueError):
             self.card.activate()
-
-    def test_load_from_db(self):
-        card = Card.load_from_db(self.card.card_id)
-        self.assertEqual(card.card_id, self.card.card_id)
-
-    def test_load_from_db_not_exist(self):
-        card = Card.load_from_db(UUID("123e4567-e89b-12d3-a456-426614174002"))
-        self.assertEqual(card, None)
-
-    def test_delete_card(self):
-        card_id = self.card.card_id
-        self.card.delete_card()
-        card = Card.load_from_db(card_id)
-        self.assertEqual(card, None)

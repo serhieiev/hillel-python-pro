@@ -1,86 +1,108 @@
-from django.test import TestCase, Client
-from ..models import Card, CardStatus
-import json
-from uuid import uuid4
+from django.contrib.auth.models import User
+from rest_framework.test import APITestCase, APIClient, force_authenticate
+from django.urls import reverse
+from rest_framework import status
+from ..models.card import Card, CardStatus
+from uuid import UUID
 
 
-class CardViewTest(TestCase):
+class CardViewTest(APITestCase):
     def setUp(self):
-        self.client = Client()
-        self.valid_card_data = {
-            "card_number": "4532015112830366",
-            "card_expire_date": "2027-07-10",
-            "card_cvv": "123",
-            "card_issue_date": "2023-07-10",
-            "card_holder_id": str(uuid4()),
-            "card_status": CardStatus.NEW.value,
-        }
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client = APIClient()
+        self.client.force_authenticate(user=self.user)
+        self.card = Card.objects.create(
+            card_number="4532015112830366",
+            card_expire_date="2025-07-09",
+            card_cvv="123",
+            card_issue_date="2022-07-09",
+            card_holder_id=UUID("123e4567-e89b-12d3-a456-426614174000"),
+            card_status=CardStatus.NEW.value,
+            owner=self.user,
+        )
 
-        self.card = Card.objects.create(**self.valid_card_data)
-        self.card_id = str(self.card.card_id)
+    def test_retrieve_card(self):
+        url = reverse(
+            "creditcards:cards-retrieve-update", kwargs={"pk": self.card.card_id}
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["card_id"], str(self.card.card_id))
+        self.assertEqual(response.data["card_holder_id"], str(self.card.card_holder_id))
+        self.assertEqual(response.data["card_status"], self.card.card_status)
+        self.assertEqual(
+            response.data["card_issue_date"], str(self.card.card_issue_date)
+        )
+        self.assertEqual(
+            response.data["card_expire_date"], str(self.card.card_expire_date)
+        )
+        self.assertEqual(response.data["card_holder_id"], str(self.card.card_holder_id))
+
+    def test_list_cards(self):
+        url = reverse("creditcards:cards-list-create")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(isinstance(response.data, list))
+        self.assertGreaterEqual(len(response.data), 1)
 
     def test_create_card(self):
-        response = self.client.post(
-            "/card",
-            data=json.dumps(self.valid_card_data),
-            content_type="application/json",
-        )
-        self.assertEqual(response.status_code, 201)
-        response_data = json.loads(response.content)
-        self.assertIn("message", response_data)
-        self.assertEqual(response_data["message"], "Card created")
-        self.assertIn("card_id", response_data)
+        url = reverse("creditcards:cards-list-create")
+        data = {
+            "card_number": "4532015112830366",
+            "card_expire_date": "2025-07-09",
+            "card_cvv": "123",
+            "card_issue_date": "2022-07-09",
+            "card_holder_id": "123e4567-e89b-12d3-a456-426614174000",
+            "card_status": CardStatus.NEW.value,
+            "owner": self.user.id,
+        }
+        response = self.client.post(url, data, format="json")
 
-    def test_create_card_invalid_card_number(self):
-        invalid_card_data = self.valid_card_data.copy()
-        invalid_card_data["card_number"] = "3706861257307453"
-        response = self.client.post(
-            "/card", data=json.dumps(invalid_card_data), content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
-        self.assertIn("error", response_data)
-        self.assertEqual(response_data["error"], "Invalid card number")
-
-    def test_get_card(self):
-        response = self.client.get(f"/card/{self.card_id}")
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
-        self.assertEqual(response_data["card_id"], self.card_id)
-
-    def test_get_card_not_found(self):
-        response = self.client.get("/card/non_existent_card_id")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_activate_card(self):
-        response = self.client.put(f"/card/{self.card_id}/activate")
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
-        self.assertEqual(response_data["status"], "Card activated")
+        # Set the card status to NEW before attempting to activate
+        self.card.card_status = CardStatus.NEW.value
+        self.card.save()
 
-    def test_block_card(self):
-        response = self.client.put(f"/card/{self.card_id}/block")
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
-        self.assertEqual(response_data["status"], "Card blocked")
+        url = reverse("creditcards:activate-card", kwargs={"pk": self.card.card_id})
+        response = self.client.patch(url)
 
-    def test_activate_blocked_card(self):
-        # Block the card
-        response = self.client.put(f"/card/{self.card_id}/block")
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.card_status, CardStatus.ACTIVE.value)
 
-        # Try to activate the blocked card
-        response = self.client.put(f"/card/{self.card_id}/activate")
-        self.assertEqual(response.status_code, 400)
-        response_data = json.loads(response.content)
-        self.assertEqual(response_data["error"], "Cannot activate a blocked card")
+    def test_freeze_card(self):
+        # Set the card status to ACTIVE before attempting to freeze
+        self.card.card_status = CardStatus.ACTIVE.value
+        self.card.save()
 
-    def test_delete_card(self):
-        response = self.client.delete(f"/card/{self.card_id}/delete")
-        self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
-        self.assertEqual(response_data["status"], "Card deleted")
+        url = reverse("creditcards:freeze-card", kwargs={"pk": self.card.card_id})
+        response = self.client.patch(url)
 
-        # Check that card is actually deleted
-        response = self.client.get(f"/card/{self.card_id}/")
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.card_status, CardStatus.FROZEN.value)
+
+    def test_reactivate_card(self):
+        # Set the card status to FROZEN before attempting to reactivate
+        self.card.card_status = CardStatus.FROZEN.value
+        self.card.save()
+
+        url = reverse("creditcards:reactivate-card", kwargs={"pk": self.card.card_id})
+        response = self.client.patch(url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.card_status, CardStatus.ACTIVE.value)
+
+    def test_set_card_name(self):
+        url = reverse("creditcards:set-card-name", kwargs={"pk": self.card.card_id})
+        data = {"card_name": "New Card Name"}
+        response = self.client.patch(url, data, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.card.refresh_from_db()
+        self.assertEqual(self.card.card_name, data["card_name"])

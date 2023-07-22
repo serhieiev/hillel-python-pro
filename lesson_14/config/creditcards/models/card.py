@@ -3,6 +3,7 @@ from uuid import UUID, uuid4
 from datetime import date
 from enum import Enum
 from django.db import models
+from django.conf import settings
 from fernet_fields import EncryptedTextField
 
 
@@ -10,16 +11,19 @@ class CardStatus(Enum):
     NEW = "NEW"
     ACTIVE = "ACTIVE"
     BLOCKED = "BLOCKED"
+    FROZEN = "FROZEN"
 
 
 class Card(models.Model):
     card_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     card_number = EncryptedTextField()
+    card_issue_date = models.CharField(max_length=10)
     card_expire_date = models.CharField(max_length=10)
     card_cvv = EncryptedTextField()
-    card_issue_date = models.DateField()
     card_holder_id = models.UUIDField()
-    card_status = models.CharField(max_length=10)
+    card_name = models.CharField(max_length=255, blank=True)
+    card_status = models.CharField(max_length=10, default=CardStatus.NEW.value)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
