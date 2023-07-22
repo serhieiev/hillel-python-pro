@@ -1,10 +1,26 @@
 from django.urls import path
-from . import views
+from .views.cards_view import (
+    CardListCreateAPIView,
+    CardRetrieveUpdateAPIView,
+    ActivateCardView,
+    FreezeCardView,
+    ReactivateCardView,
+    SetCardNameView,
+)
+
+app_name = "creditcards"
 
 urlpatterns = [
-    path("card", views.create_card, name="create_card"),
-    path("card/<uuid:card_id>", views.get_card, name="get_card"),
-    path("card/<uuid:card_id>/activate", views.activate_card, name="activate_card"),
-    path("card/<uuid:card_id>/block", views.block_card, name="block_card"),
-    path("card/<uuid:card_id>/delete", views.delete_card, name="delete_card"),
+    path("cards/", CardListCreateAPIView.as_view(), name="cards-list-create"),
+    path(
+        "cards/<pk>/", CardRetrieveUpdateAPIView.as_view(), name="cards-retrieve-update"
+    ),
+    path("cards/<uuid:pk>/activate", ActivateCardView.as_view(), name="activate-card"),
+    path("cards/<uuid:pk>/freeze", FreezeCardView.as_view(), name="freeze-card"),
+    path(
+        "cards/<uuid:pk>/reactivate",
+        ReactivateCardView.as_view(),
+        name="reactivate-card",
+    ),
+    path("cards/<uuid:pk>/setname", SetCardNameView.as_view(), name="set-card-name"),
 ]
