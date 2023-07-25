@@ -62,6 +62,34 @@ class CardViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+        expected_keys = [
+            "card_id",
+            "card_expire_date",
+            "card_issue_date",
+            "card_holder_id",
+            "card_status",
+            "created_at",
+            "modified_at",
+            "card_name",
+            "masked_card_number",
+        ]
+        self.assertCountEqual(response.data.keys(), expected_keys)
+
+        keys_to_compare = [
+            "card_expire_date",
+            "card_issue_date",
+            "card_holder_id",
+            "card_status",
+        ]
+
+        response_subset = {key: response.data.get(key) for key in keys_to_compare}
+        data_subset = {key: data.get(key) for key in keys_to_compare}
+
+        self.assertDictEqual(response_subset, data_subset)
+        self.assertEqual(
+            Card.objects.filter(card_id=response.data["card_id"]).count(), 1
+        )
+
     def test_activate_card(self):
         # Set the card status to NEW before attempting to activate
         self.card.card_status = CardStatus.NEW.value
@@ -72,7 +100,12 @@ class CardViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.card.refresh_from_db()
+
         self.assertEqual(self.card.card_status, CardStatus.ACTIVE.value)
+        self.assertEqual(
+            Card.objects.get(card_id=self.card.card_id).card_status,
+            CardStatus.ACTIVE.value,
+        )
 
     def test_freeze_card(self):
         # Set the card status to ACTIVE before attempting to freeze
@@ -84,7 +117,12 @@ class CardViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.card.refresh_from_db()
+
         self.assertEqual(self.card.card_status, CardStatus.FROZEN.value)
+        self.assertEqual(
+            Card.objects.get(card_id=self.card.card_id).card_status,
+            CardStatus.FROZEN.value,
+        )
 
     def test_reactivate_card(self):
         # Set the card status to FROZEN before attempting to reactivate
@@ -96,7 +134,12 @@ class CardViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.card.refresh_from_db()
+
         self.assertEqual(self.card.card_status, CardStatus.ACTIVE.value)
+        self.assertEqual(
+            Card.objects.get(card_id=self.card.card_id).card_status,
+            CardStatus.ACTIVE.value,
+        )
 
     def test_set_card_name(self):
         url = reverse("creditcards:set-card-name", kwargs={"pk": self.card.card_id})
@@ -105,4 +148,8 @@ class CardViewTest(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.card.refresh_from_db()
+
         self.assertEqual(self.card.card_name, data["card_name"])
+        self.assertEqual(
+            Card.objects.get(card_id=self.card.card_id).card_name, data["card_name"]
+        )
