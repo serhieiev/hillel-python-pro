@@ -1,3 +1,4 @@
+from celery import shared_task
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from ..serializers.card_serializers import (
     CardStatusSerializer,
     CardNameSerializer,
 )
+from ..tasks.activate_card import activate_card
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsCardOwner
 from rest_framework.exceptions import NotFound
@@ -25,16 +27,12 @@ class CardListCreateAPIView(APIView):
         serializer = CardSerializer(data=request.data)
         if serializer.is_valid():
             validated_data = serializer.validated_data
-            owner = validated_data.pop(
-                "owner", None
-            )
+            owner = validated_data.pop("owner", None)
             card = Card(**validated_data, owner=request.user)
             try:
                 if card.is_valid():
                     card.save()
-                    serializer = CardSerializer(
-                        card
-                    )
+                    serializer = CardSerializer(card)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return Response(
@@ -85,6 +83,16 @@ class BaseCardStatusView(generics.UpdateAPIView):
 class ActivateCardView(BaseCardStatusView):
     required_status = CardStatus.NEW
     new_status = CardStatus.ACTIVE
+
+    def patch(self, request, *args, **kwargs):
+        card = self.get_object()
+        if card.card_status != self.required_status.value:
+            return super().patch(request, *args, **kwargs)
+
+        activate_card.apply_async((card.card_id,), countdown=120)
+        return Response(
+            {"status": "activation scheduled"}, status=status.HTTP_202_ACCEPTED
+        )
 
 
 class FreezeCardView(BaseCardStatusView):
