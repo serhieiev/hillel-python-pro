@@ -1,16 +1,19 @@
 import re
 import pytest
 
+
 def validate_ukrainian_passport(passport):
-    pattern = r'^[A-Z0-9]{2}\d{6}$'
+    pattern = r'^[A-Z]{2}\d{6}$'
     return bool(re.match(pattern, passport))
 
 
 @pytest.mark.parametrize("passport, expected", [
     ('AB123456', True),
     ('XY987654', True),
-    ('12ABCDE6', False),
-    ('AA1234', False),
+    ('12345678', False),
+    ('ABC45678', False),
+    ('A1234567', False),
+    ('AA12345', False),
     ('AB1234567', False),
     ('ab123456', False),
 ])
